@@ -2,7 +2,7 @@
 
 ## Contains 
 
-- a the tutorial examples
+- the tutorial examples
 
 - various code for the manipulation of root files
 
