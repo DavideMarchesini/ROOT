@@ -1,0 +1,464 @@
+******************
+Comandi utilti per istogramma hist
+SetLineColor, SetLineStyle , SetLineWidth
+SetFillColor , SetFillStyle
+SetMarkerColor, SetMarkerStyle, SetMarkerSize
+
+•histo->Draw(“P”) disegna i marker su ogni bin
+•histo->Draw(“E”) disegna le barre di errore statistico (radice quadrata del contenuto)
+•histo->Draw(“SAME”) disegna l’istogramma sovrapposto agli oggetti disegnati prima
+
+histoG->SetFillColor(kRed) //rosso
+histoU->SetFillColor(kGreen) //verde
+
+Comandi utilti per grafici
+g->Draw(“A*”) disegna delle star
+g->SetTitle(“Primo Grafico”)
+TF1 *f = new TF1(“f”,”x^2+2*x+1”,-4.,4.) disegna la funzione
+
+******************
+
+
+void tut1(){
+   TH1F *hist=new TH1F("hist", "Histogram", 100, 0, 100);
+   hist->Fill(10);
+   hist->Fill(50);
+   hist->GetXaxis()->SetTitle("X axis");
+   hist->GetYaxis()->SetTitle("Y axis");
+   TCanvas *c1=new TCanvas();
+   hist->Draw();
+}
+
+******************
+
+void tut2(){
+  double x[5]={1,2,3,6,7};
+  double y[5]={5,8,9,2,7};
+  TGraph *gr=new TGraph(5, x, y);
+  gr->SetMarkerStyle(10);
+  gr->SetMarkerSize(5);
+  TCanvas *c1=new TCanvas();
+  gr->Draw("ACP");
+}
+
+******************
+
+void tut3(){
+   TH1F *hist=new TH1F("hist", "Histogram", 9, 1, 10);
+   fstream file;
+   file.open("data.txt", ios::in);
+   double value;
+   while(1){
+     file>>value;
+     hist->Fill(value);
+     if(file.eof()) break;
+   }
+   hist->GetXaxis()->SetTitle("X axis");
+   hist->GetYaxis()->SetTitle("Y axis");
+   TCanvas *c1=new TCanvas();
+   hist->Draw();
+}
+
+******************
+
+void tut4(){
+  TGraph *gr=new TGraph();
+  gr->SetMarkerStyle(10);
+  gr->SetMarkerSize(5);
+  gr->SetTitle("Graph");
+  fstream file;
+  file.open("data2.txt", ios::in);
+  while(1){
+    double x, y;
+    file>>x>>y;
+    gr->SetPoint(gr->GetN(), x, y);
+    if(file.eof()) break;
+  }
+  file.close();
+  TCanvas *c1=new TCanvas();
+  gr->Draw("ACP");
+}
+
+******************
+
+
+void tut7()
+{
+    TH1F *hist = new TH1F("hist", "Histogram", 100, -5, 5);
+    hist->FillRandom("gaus", 10000);
+    
+    TF1 *fit=new TF1("fit", "gaus", -1, 2);
+    TCanvas *c1 = new TCanvas();
+    hist->Draw();
+    fit->SetParameter(0, 5);
+    fit->SetParameter(1, 0);
+    hist->Fit("fit", "R");
+    /*R per mettere che guardi la regione di fit*/
+    double mean=fit->GetParameter(1);
+    double sigma=fit->GetParameter(2);
+    cout<<mean<<"    "<<sigma<<endl;
+}
+
+******************
+
+void tut8()
+{
+    TH1F *hist = new TH1F("hist", "Histogram", 100, -5, 5);
+    hist->FillRandom("gaus", 10000);
+    
+    TF1 *fit=new TF1("fit", "gaus", -1, 2);
+    TCanvas *c1 = new TCanvas();
+    hist->SetStats(0); //non mette la legenda
+    hist->Draw();
+    fit->SetParameter(0, 5);
+    fit->SetParameter(1, 0);
+    hist->Fit("fit", "R");
+    TLegend *leg=new TLegend(0.7, 0.7, 0.9, 0.9);
+    leg->AddEntry(hist, "Measure data", "l"); //mostra la linea L oppure i punti P
+    leg->AddEntry(fit, "Fit function", "l");
+    leg->Draw();
+    /*R per mettere che guardi la regione di fit*/
+    double mean=fit->GetParameter(1);
+    double sigma=fit->GetParameter(2);
+    cout<<mean<<"    "<<sigma<<endl;
+}
+
+******************
+
+void tut9()
+{
+    TH1F *hist = new TH1F("hist", "Histogram", 100, -5, 5);
+    hist->FillRandom("gaus", 10000);
+    hist->SetFillColor(kGreen-10);//setto colore e intensita
+    hist->GetXaxis()->SetTitle("Prova");
+    hist->GetXaxis()->SetTitleSize(0.01);//grandezza del titolo in x
+    hist->GetXaxis()->SetLabelSize(0.01);//grandezza dei numeri in x
+    TF1 *fit=new TF1("fit", "gaus", -1, 2);
+    TCanvas *c1 = new TCanvas();
+    fit->SetLineWidth(2);
+    fit->SetLineColor(kBlue);//colore line
+    fit->SetLineStyle(2);//stile line
+    hist->SetStats(0); //non mette la legenda
+    c1->SetTicky();//mytics
+    c1->SetTickx();
+    c1->SetGridx();//crea una griglia
+    c1->SetGridy();
+    hist->Draw();
+    fit->SetParameter(0, 5);
+    fit->SetParameter(1, 0);
+    hist->Fit("fit", "R");
+    TLegend *leg=new TLegend(0.5, 0.7, 0.8, 0.8);
+    leg->SetBorderSize(0);//toglie il bordo
+    leg->AddEntry(hist, "Measure data", "F"); //mostra la linea L oppure i punti P , F per fill riempie
+    
+    leg->AddEntry(fit, "Fit function", "l");
+    leg->Draw();
+    /*R per mettere che guardi la regione di fit*/
+    double mean=fit->GetParameter(1);
+    double sigma=fit->GetParameter(2);
+    cout<<mean<<"    "<<sigma<<endl;
+}
+
+******************
+
+void tut10(){
+  TCanvas *c1=new TCanvas();
+  TGraphErrors *gr=new TGraphErrors();
+  fstream file;
+  file.open("data3.txt", ios::in);
+  double x, y, ex, ey;
+  int n=0;
+  while(1){
+    file>>x>>y>>ex>>ey;
+    n=gr->GetN();
+    gr->SetPoint(n, x, y);
+    gr->SetPointError(n, ex, ey);
+    if(file.eof())  break;
+  }
+  gr->Draw("A*");
+  TF1 *fit=new TF1("fit", "pol1", 0, 5);
+  gr->Fit("fit");
+}
+
+******************
+
+void tut11()
+{
+    TH1F *hist = new TH1F("hist", "Histogram", 100, -5, 5);
+    hist->FillRandom("gaus", 10000);
+    hist->SetFillColor(kGreen-10);//setto colore e intensita
+    hist->GetXaxis()->SetTitle("Prova");
+    hist->GetXaxis()->SetTitleSize(1);//grandezza del titolo in x
+   // hist->GetXaxis()->SetLabelSize(1);//grandezza dei numeri in x
+    TF1 *fit=new TF1("fit", "gaus", -1, 2);
+    TCanvas *c1 = new TCanvas();
+    fit->SetLineWidth(2);
+    fit->SetLineColor(kBlue);//colore line
+    fit->SetLineStyle(2);//stile line
+    hist->SetStats(0); //non mette la legenda
+    c1->SetTicky();//mytics
+    c1->SetTickx();
+    c1->SetGridx();//crea una griglia
+    c1->SetGridy();
+    hist->Draw();
+    fit->SetParameter(0, 5);
+    fit->SetParameter(1, 0);
+    hist->Fit("fit", "R");
+    TLegend *leg=new TLegend(0.5, 0.7, 0.8, 0.8);
+    leg->SetBorderSize(0);//toglie il bordo
+    leg->AddEntry(hist, "Measure data", "F"); //mostra la linea L oppure i punti P , F per fill riempie
+    leg->AddEntry(fit, "Fit function", "l");
+    leg->Draw();
+    
+    TLine *l=new TLine(-5, 200, 5, 200);//retta con xmin, ymin, xmax, ymax
+    l->SetLineWidth(2);
+    l->SetLineColor(kOrange);
+    l->Draw();
+    double x0=1.5;
+    int bin=hist->FindBin(x0);
+    double y0=hist->GetBinContent(bin);
+    TArrow *arr=new TArrow(3, 200, x0, y0);
+    arr->Draw();
+    
+    TLatex *t=new TLatex(2, 200, "Important");
+    t->Draw();
+    
+    /*R per mettere che guardi la regione di fit*/
+    double mean=fit->GetParameter(1);
+    double sigma=fit->GetParameter(2);
+    cout<<mean<<"    "<<sigma<<endl;
+}
+
+******************
+
+void tut12(){
+  TCanvas *c1 =new TCanvas();
+  TF1 *func=new TF1("func", "[0]+[1]*x", 0, 5);
+  func->SetParameter(0, 1);
+  func->SetParameter(1, 2);
+  func->Draw();
+  c1->Print("func.tex");
+}
+
+******************
+
+void tut14(){
+  /*we store data in a root file*/
+  TFile *file=new TFile("output.root", "RECREATE");
+  TH1F *hist=new TH1F("hist", "Histogram", 100, 0, 100);
+  hist->Fill(10);
+  hist->Fill(90);
+  file->Write();
+  file->Close();
+}
+
+******************
+
+void tut15(){
+  fstream file;
+  file.open("data4.txt", ios::in);
+  double x, y;
+  TFile *output=new TFile("data4.root", "RECREATE");
+  TTree *tree =new TTree("tree", "tree"); //definizione di tree
+  tree->Branch("x", &x, "x/D"); //nome variabile, variabile da indicare, x/D indica un float
+  tree->Branch("y", &y, "y/D");
+  while(1){
+    file>>x>>y;
+    if(file.eof()) break;
+    cout<<x<<"    "<<y<<endl;
+    tree->Fill();
+  }
+  output->Write();
+  output->Close();
+  file.close();
+}
+
+******************
+
+void tut16(){
+  TFile *input=new TFile("data4.root", "READ");
+  double x, y;
+  TCanvas *c1=new TCanvas();
+  TTree *tree=(TTree*)input->Get("prendere");//prendiamo il tree che desiseriamo e lo chiamiamo tree
+  tree->SetBranchAddress("x", &x);
+  tree->SetBranchAddress("y", &y);
+  TH1F *hist=new TH1F("hist", "Histogram", 20, 0, 20);
+  int entries=tree->GetEntries();
+  cout<<entries<<endl;
+  for(int i=0; i<entries; i++){
+    tree->GetEntry(i);
+    cout<<x<<"   "<<y<<endl;
+    hist->Fill(x);
+  }
+  
+ // input->Close();
+  hist->Draw();
+}
+
+******************
+
+void tut17(){
+  TCanvas *c1=new TCanvas();
+  gStyle->SetPalette(kRainBow);
+  TH2F *hist =new TH2F("hist", "Histogram", 100, -1, 1, 100, -1, 1);//nbinx, xmin, xmax, nbiny, ymin, ymax
+  hist->SetStats(0);
+  TRandom *rand=new TRandom(10);
+  for(int i=0; i<1e6; i++){
+    double x=rand->Gaus();
+    double y=rand->Gaus();
+    hist->Fill(x, y);
+  }
+  hist->SetContour(1000);//fa i colori piu lineari
+  hist->Draw("colz");
+}
+
+******************
+
+void tut19(){
+  TCanvas *c1=new TCanvas();
+  TProfile *hprof=new TProfile("hprof", "Proflie", 100, 0, 10, "S");//S restituisce la barra di errore con STDDEVy
+  TRandom2 *rand=new TRandom2();
+  for(int i=0; i<1000; i++){
+    hprof->Fill(rand->Rndm(), rand->Rndm());
+  }
+  /*hprof->Fill(1, 4);
+  hprof->Fill(1, 6);*/
+  hprof->Draw();
+}
+
+
+******************
+
+void write(){
+  TFile *output=new TFile("tut20.root", "RECREATE");
+  TTree *tree =new TTree("tree", "tree");
+  double x, y;
+  tree->Branch("x", &x, "x/D");
+  tree->Branch("y", &y, "y/D");
+  TRandom2 *r=new TRandom2();
+  for (int i=0; i<10000000; i++){
+    x=1+r->Rndm()*9;
+    y=x*2;
+    tree->Fill();
+  }
+  output->Write();
+  output->Close();
+}
+
+void cut(){
+  TCut cut1="x<5.0";
+  TCut cut2="x>6.0";
+  TFile *input=new TFile("tut20.root", "READ");
+  TTree *tree=(TTree*)input->Get("tree");
+  //tree->Draw("y", cut1&&cut2);
+  tree->Draw("y", cut1||cut2);
+}
+
+void tut20(){
+  write();
+  cut();
+}
+
+******************
+
+void write(TString filename){
+  TFile *output=new TFile(filename, "RECREATE");
+  TTree *tree =new TTree("tree", "tree");
+  double x, y;
+  tree->Branch("x", &x, "x/D");
+  tree->Branch("y", &y, "y/D");
+  TRandom2 *r=new TRandom2();
+  for (int i=0; i<1000; i++){
+    x=1+r->Rndm()*9;
+    y=x*2;
+    tree->Fill();
+  }
+  output->Write();
+  output->Close();
+}
+
+void chain(){
+  TChain *ch1=new TChain("tree");
+  ch1->Add("tut21a.root");
+  ch1->Add("tut21b.root");
+  ch1->Add("tut21b.root");
+  double x;
+  ch1->SetBranchAddress("x", &x);
+  TH1F *hist=new TH1F("hist", "Histogram", 100, 1, 10);
+  int entries=ch1->GetEntries();
+  for (int i=0; i<entries; i++){
+    ch1->GetEntry();
+    hist->Fill(x);
+  }
+  TCanvas *c1=new TCanvas();
+  hist->Draw();
+}
+
+void tut21(){
+  write("tut21a.root");
+  write("tut21b.root");
+  chain();
+}
+
+******************
+
+void tut23(TString filename){
+  TFile *file=new TFile(filename);
+}
+
+******************
+
+void tut24(){
+  THStack *hstack=new THStack();
+  TH1F *hist=new TH1F("hist", "Histogram", 100, -10, 10);
+  TH1F *hist2=new TH1F("hist2", "Histogram", 100, -10, 10);
+  hstack->Add(hist);
+  hstack->Add(hist2);
+  hist->FillRandom("gaus");
+  hist2->FillRandom("gaus");
+  TCanvas *c1=new TCanvas();
+  //hist->Draw();
+  hist->SetFillColor(38);
+  hist2->SetFillColor(46);
+ // hist2->Draw("same");//sovrappone ma con los tesso colore
+  TCanvas *c2=new TCanvas();
+  hstack->Draw();//plotta considerando le altezze di entrambe
+}
+
+******************
+
+void tup(){  
+    TNtuple *nt=new TNtuple("nt", "variabili", "var1:var2:var3");  
+    nt->Fill(1,2,3);
+    nt->Fill(4,5,6);
+    nt->Fill(7,8,9);
+    nt->Fill(2,4,8);
+    TCanvas *c1 = new TCanvas();
+    nt->Draw("var1");
+}
+
+******************
+
+void tup2(){
+  TFile *ofile=new TFile("conductivityexperiment.root", "RECREATE");
+  TNtuple *conddata=new TNtuple("conddata", "Example", "Po:C:T:Pr");
+  TRandom3 *rndm=new TRandom3();
+  float pot, cur, temp, pres;
+  for (int i=0; i<100; i++){
+    pot=rndm->Uniform(0, 10);
+    cur=rndm->Uniform(0, 10);
+    temp=rndm->Uniform(0, 10);
+    pres=rndm->Uniform(0, 10);
+    conddata->Fill(pot, cur, temp, pres);
+  }
+  conddata->Write();
+  ofile->Close();
+}
+
+******************
+
+void tup3(){
+   TFile *ifile=new TFile("conductivityexperiment.root", "READ");
+   TNtuple *nt=new TNtuple("nt", "Example", "Po:C:T:Pr");
+   
+}
